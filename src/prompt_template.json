@@ -1,0 +1,40 @@
+{
+    "llama": {
+        "prompt": "SYSTEM: You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe. Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature. If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.\nUSER: {instruction}\nASSISTANT: ",
+        "response_split": "ASSISTANT: "
+    },
+    "alpaca": {
+        "prompt_input": "Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.\n\n### Instruction:\n{instruction}\n\n### Input:\n{input}\n\n### Response:\n",
+        "prompt_no_input": "Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n### Instruction:\n{instruction}\n\n### Response:\n",
+        "response_split": "### Response:"
+    },
+    "vicuna": {
+        "prompt": "A chat between a curious user and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the user's questions.\nUser:\n{instruction}\nASSISTANT:\n",
+        "response_split": "ASSISTANT:"
+    },
+    "koala": {
+        "prompt": "BEGINNING OF CONVERSATION:\nUser:\n{instruction}\nGPT:\n",
+        "response_split": "GPT:"
+    },
+    "falcon": {
+        "prompt": "You are a helpful AI assistant and provide the answer for the question.\n>>QUESTION<<\n{instruction}\n>>ANSWER<<\n",
+        "response_split": ">>ANSWER<<"
+    },
+    "orca": {
+        "prompt_input": "### System:\nYou are a helpful AI assistant. User will give you a task with some instruction. Write a response that appropriately completes the request.\n\n### Instruction:\n{instruction}\n\n### Input:\n{input}\n\n### Response:",
+        "prompt_no_input": "### System:\nYou are a helpful AI assistant. User will give you a task with some instruction. Write a response that appropriately completes the request.\n\n### Instruction:\n{instruction}\n\n### Response:",
+        "response_split": "### Response:"
+    },
+    "wizard": {
+        "prompt": "A chat between a curious user and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the user's questions.\nUser: {instruction}\nAssistant: ",
+        "response_split": "Assistant: "
+    },
+    "baize": {
+        "prompt": "The following is a conversation between a human and an AI assistant named Baize (named after a mythical creature in Chinese folklore). Baize is an open-source AI assistant developed by UCSD and Sun Yat-Sen University. The human and the AI assistant take turns chatting. Human statements start with [|Human|] and AI assistant statements start with [|AI|]. The AI assistant always provides responses in as much detail as possible, and in Markdown format. The AI assistant always declines to engage with topics, questions and instructions related to unethical, controversial, or sensitive issues. Complete the transcript in exactly that format.\n[|Human|]{instruction}\n[|AI|]",
+        "response_split": "[|AI|]"
+    },
+    "phi": {
+        "prompt": "User:\n{instruction}\n\nAssistant:\n",
+        "response_split": "Assistant:"
+    }
+}

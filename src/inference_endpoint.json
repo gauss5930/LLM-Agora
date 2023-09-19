@@ -1,0 +1,29 @@
+{
+    "llama": {
+        "API_URL": ""
+    },
+    "alpaca": {
+        "API_URL": ""
+    },
+    "vicuna": {
+        "API_URL": ""
+    },
+    "koala": {
+        "API_URL": ""
+    },
+    "falcon": {
+        "API_URL": ""
+    },
+    "orca": {
+        "API_URL": ""
+    },
+    "wizard": {
+        "API_URL": ""
+    },
+    "baize": {
+        "API_URL": ""
+    },
+    "phi": {
+        "API_URL": ""
+    }
+}
