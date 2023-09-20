@@ -29,7 +29,7 @@ def args_parse():
     )
     parser.add_argument(
         "--output_dir",
-        default="/Math/maht_result.json",
+        default="/Math",
         type=str,
         help="Directory to save the result file"
     )
@@ -47,18 +47,29 @@ def load_json(prompt_path, endpoint_path):
 
 def construct_message(agents, instruction, idx):
     if len(agents) == 0:
-        prompt = "Can you verify that your answer is correct. Please reiterate your answer, making sure to state your answer at the end of the response."
+        prompt = "Can you double check that your answer is correct. Please reiterate your answer, making sure to state your answer at the end of the response."
         return prompt
     
     contexts = [agents[0][idx]['content'], agents[1][idx]['content'], agents[2][idx]['content']]
 
-    sys_prompt = f"You are a helpful and precise assistant for summarizing the response of several models."
+    # system prompt & user prompt for gpt-3.5-turbo
+    sys_prompt = f"I want you to act as a summarizer. You can look at multiple responses and summarize the main points of them so that the meaning is not lost. Multiple responses will be given, which are responses from several different models to a single question. And you should use your excellent summarizing skills to output the best summary."
     summarize_prompt = f"[Response 1]: {contexts[0]}\n[Response 2]: {contexts[1]}\nResponse 3: {contexts[2]}\n\nThese are response of each model to a certain question. Summarize comprehensively without compromising the meaning of each response."
 
-    # ChatGPT의 summarization 생성 코드 적어두기
+    message = [
+        {"role": "system", "content": sys_prompt},
+        {"role": "user", "content": summarize_prompt},
+    ]
 
-    prefix_string = f"This is the summarization of recent/updated opinions from other agents: {}"
-    prefix_string = prefix_string + "\n\n Use these opinions carefully as additional advice, can you provide an updated answer? Make sure to state your answer at the end of the response." + instruction
+    completion = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo-16k-0613",
+        messages=message,
+        max_tokens=256,
+        n=1
+    )
+
+    prefix_string = f"This is the summarization of recent/updated opinions from other agents: {completion}"
+    prefix_string = prefix_string + "\n\n Use this summarization carefully as additional advice, can you provide an updated answer? Make sure to state your answer at the end of the response." + instruction
     return prefix_string
 
 def generate_math(agents):
@@ -116,7 +127,7 @@ if __name__ == "__main__":
             time.sleep(5)
             return generate_answer(API_URL, headers, payload)
         
-        return response[0]["generated_text"].split(prompt_dict[model]["response_split"])[-1]
+        return {"model": model, "content": response[0]["generated_text"].split(prompt_dict[model]["response_split"])[-1]}
     
     def prompt_formatting(model, instruction, cot):
         if model == "alpaca" or model == "orca":
@@ -127,51 +138,58 @@ if __name__ == "__main__":
         if cot:
             instruction += "Let's think step by step."
 
-        return prompt.format(instruction)
+        return {"model": model, "content": prompt.format(instruction)}
 
     agents = len(model_list)
-    rounds = 3
+    rounds = args.round
     np.random.seed(0)
 
-    evaluation_round = 100
+    evaluation = 100
     scores = []
 
     generated_description = []
 
-    for iteration in tqdm(range(evaluation_round)):
+    for round in tqdm(range(evaluation)):
         agent_contexts, content, question_prompt, answer = generate_math(agents=model_list)
 
-        # Debation
-        for round in range(rounds):
-            for i, agent_context in enumerate(agent_contexts):
+        print(f"# Question No.{round} starts...")
 
-                # Refer to the summarized previous response
-                if round != 0:
-                    message = construct_message(agent_contexts, question_prompt, round)
-                    agent_context.append(message)
+        # Debate
+        for debate in range(rounds+1):
+            # Refer to the summarized previous response
+            if debate != 0:
+                message = construct_message(agent_contexts, question_prompt, 2 * debate - 1)
+                for i in range(agent_contexts):
+                    agent_contexts[i].append(prompt_formatting(agent_contexts[i][-1]["model"], message, args.cot))
 
-                # Generate new response based on summarized response
-                completion = generate_answer(agent_context["model"], prompt_formatting(agent_context))
+            # Generate new response based on summarized response
+            for agent_context in agent_contexts:
+                completion = generate_answer(agent_context[-1]["model"], agent_context[-1]["content"] if debate != 0 else prompt_formatting(agent_context[-1]["model"], agent_context[-1]["content"], args.cot)["content"])
                 agent_context.append(completion)
+
+        print(f"# Question No.{round} debate is ended.")
 
         text_answers = []
 
         for agent in agent_contexts:
-            text_answer = string = agent_context[-1]["content"]
+            text_answer = string = agent[-1]["content"]
             text_answer = text_answer.replace(",", ".")
             text_answer = parse_answer(text_answer)
 
-            if text_answer is None:
+            if not text_answer:
                 continue
 
             text_answers.append(text_answer)
 
         models_response = {
-            f"{args.m1}": [agent_contexts[0][0]["content"], agent_contexts[0][1]["content"], agent_contexts[0][-1]["content"]],
-            f"{args.m2}": [agent_contexts[1][0]["content"], agent_contexts[1][1]["content"], agent_contexts[1][-1]["content"]],
-            f"{args.m3}": [agent_contexts[2][0]["content"], agent_contexts[2][1]["content"], agent_contexts[2][-1]["content"]]
+            f"{args.m1}": [agent_contexts[0][1]["content"], agent_contexts[0][3]["content"], agent_contexts[0][-1]["content"]],
+            f"{args.m2}": [agent_contexts[1][1]["content"], agent_contexts[1][3]["content"], agent_contexts[1][-1]["content"]],
+            f"{args.m3}": [agent_contexts[2][1]["content"], agent_contexts[2][3]["content"], agent_contexts[2][-1]["content"]]
         }
-        generated_description.append({"question_id": iteration, "question": content, "agent_contexts": models_response, "answer": answer})
+        response_summarization = [
+            agent_contexts[0][2], agent_contexts[0][4]
+        ]
+        generated_description.append({"question_id": round, "question": content, "agent_response": models_response, "summarization": response_summarization, "answer": answer})
 
         try:
             text_answer = most_frequent(text_answers)
@@ -182,5 +200,20 @@ if __name__ == "__main__":
         except:
             continue
 
-    with open(args.output_dir, "x") as f:
+    performance = {"performance": np.mean(scores)}
+    print(f"The performance of {args.m1} & {args.m2} & {args.m3}: ", performance["performance"])
+
+    if args.cot:
+        file_name = "_cot.json"
+    else:
+        file_name = ".json"
+
+    print(f"The result file 'math_result{file_name}' is saving...")
+    with open(args.output_dir + f"/math_result{file_name}", "x") as f:
         json.dump(generated_description, f, indent=4)
+
+    print(f"The performance file 'math_performance{file_name}' is saving...")
+    with open(args.output_dir + f"/math_performance{file_name}", "x") as f:
+        json.dump(performance, f, indent=4)
+
+    print("All done!!")

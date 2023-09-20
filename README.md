@@ -5,6 +5,63 @@ LLM Agora, debating between open-source LLMs to refine the answers
 
 ## Inference
 
+**Math**
+```
+python Math/math_inference.py \
+    --model_1 llama \
+    --model_2 alpaca \
+    --model_3 vicuna \
+    --API_KEY your_OpenAI_API_KEY \
+    --auth_token your_HF_authentication_token \
+    --cot True \
+```
+
+**GSM8K**
+```
+python GSM8K/gsm_inference.py \
+    --model_1 llama \
+    --model_2 alpaca \
+    --model_3 vicuna \
+    --API_KEY your_OpenAI_API_KEY \
+    --auth_token your_HF_authentication_token \
+    --cot True \
+```
+
+**MMLU**
+```
+python GSM8K/gsm_inference.py \
+    --model_1 llama \
+    --model_2 alpaca \
+    --model_3 vicuna \
+    --API_KEY your_OpenAI_API_KEY \
+    --auth_token your_HF_authentication_token \
+    --cot True \
+```
+
+## Evaluation
+
+### paper version
+
+You should use the same model used in inference.
+
+**GSM8K**
+```
+python GSM8K/gsm_evaluation.py \
+    --model_1 llama \
+    --model_2 alpaca \
+    --model_3 vicuna \
+    --cot True_or_False \
+```
+
+**MMLU**
+```
+python MMLU/mmlu_evaluation.py \
+    --model_1 llama \
+    --model_2 alpaca \
+    --model_3 vicuna \
+    --cot True_or_False \
+```
+
 ```
 python inference/inference.py \
     --model_1 llama \
