@@ -8,27 +8,27 @@ import argparse
 def args_parse():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-m1",
         "--model_1",
         type=str,
         help="It should be the same model used in gsm_inference.py"
     )
     parser.add_argument(
-        "-m2",
         "--model_2",
         type=str,
         help="It should be the same model used in gsm_inference.py"
     )
     parser.add_argument(
-        "-m3",
         "--model_3",
         type=str,
         help="It should be the same model used in gsm_inference.py"
     )
-    parser.add_argument("--cot", type=bool)
+    parser.add_argument(
+        "--cot",
+        action="store_true"
+    )
     parser.add_argument(
         "--output_dir",
-        default="/GSM8K",
+        default="GSM8K",
         type=str
     )
 
@@ -102,14 +102,14 @@ def most_frequent(List):
 if __name__ == "__main__":
     args = args_parse()
 
-    model_list = [args.m1, args.m2, args.m3]
+    model_list = [args.model_1, args.model_2, args.model_3]
 
     if args.cot:
         file_name = "_cot.json"
     else:
         file_name = ".json"
 
-    with open(f"/GSM8K/gsm_result{file_name}", "r") as f:
+    with open(f"GSM8K/gsm_result{file_name}", "r") as f:
         response_dict = json.load(f)
 
     questions = [response_dict[i]["question"] for i in range(len(response_dict))]

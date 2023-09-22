@@ -41,7 +41,7 @@
             "Content-Type": "application/json"
         }
     },
-    "wizard": {
+    "wizardlm": {
         "API_URL": "https://w5tclsm1vnqtavp2.us-east-1.aws.endpoints.huggingface.cloud",
         "headers": {
             "Authorization": "Bearer roRQOamWcyuRkUFyRLWGKBeEXeYROElpENLBSFjDTYFQDjPdfcbuDRuTXdwFDAbKCANBgdXgTEFHtNnVCOYYwgBwMyYAECmLuMMeZAQGPLfNGPcLprKPZQReCoPshLqc",

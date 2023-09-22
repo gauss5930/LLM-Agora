@@ -9,9 +9,9 @@ import argparse
 
 def args_parse():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-m1", "--model_1")
-    parser.add_argument("-m2", "--model_2")
-    parser.add_argument("-m3", "--model_3")
+    parser.add_argument("--model_1", type=str)
+    parser.add_argument("--model_2", type=str)
+    parser.add_argument("--model_3", type=str)
     parser.add_argument(
         "--API_KEY",
         type=str,
@@ -21,12 +21,12 @@ def args_parse():
     parser.add_argument(
         "--cot",
         default=False,
-        type='store_true',
+        action='store_true',
         help="If this is True, you can use Chain-of-Thought during inference."
     )
     parser.add_argument(
         "--output_dir",
-        default="/Math",
+        default="Math",
         type=str,
         help="Directory to save the result file"
     )
@@ -50,20 +50,25 @@ def construct_message(agents, instruction, idx):
     contexts = [agents[0][idx]['content'], agents[1][idx]['content'], agents[2][idx]['content']]
 
     # system prompt & user prompt for gpt-3.5-turbo
-    sys_prompt = f"I want you to act as a summarizer. You can look at multiple responses and summarize the main points of them so that the meaning is not lost. Multiple responses will be given, which are responses from several different models to a single question. And you should use your excellent summarizing skills to output the best summary."
-    summarize_prompt = f"[Response 1]: {contexts[0]}\n[Response 2]: {contexts[1]}\nResponse 3: {contexts[2]}\n\nThese are response of each model to a certain question. Summarize comprehensively without compromising the meaning of each response."
+    sys_prompt = f"I want you to act as a summarizer. You can look at a question and the responses to that question and summarize the main points of them so that the meaning is not lost. Multiple responses will be given, which are responses from several different models to a single question. And you should use your excellent summarizing skills to output the best summary."
+    summarize_prompt = f"[Question]: {instruction}\n[Response 1]: {contexts[0]}\n[Response 2]: {contexts[1]}\nResponse 3: {contexts[2]}\n\nThese are response of each model to a certain question. Summarize comprehensively without compromising the meaning of each response."
 
     message = [
         {"role": "system", "content": sys_prompt},
         {"role": "user", "content": summarize_prompt},
     ]
 
-    completion = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo-0613",
-        messages=message,
-        max_tokens=256,
-        n=1
-    )
+    try:
+        completion = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo-0613",
+            messages=message,
+            max_tokens=256,
+            n=1
+        )['choices'][0]['message']['content']
+    except:
+        print("retrying ChatGPT due to an error......")
+        time.sleep(5)
+        return construct_message(agents, instruction, idx)
 
     prefix_string = f"This is the summarization of recent/updated opinions from other agents: {completion}"
     prefix_string = prefix_string + f"\n\n Use this summarization carefully as additional advice, can you provide your answer to the math problem? \n The original math problem is {instruction}. Your final answer should be a single numerical number, in the form \\boxed{{answer}}, at the end of your response."
@@ -80,9 +85,9 @@ def read_jsonl(path: str):
 if __name__ == "__main__":
     args = args_parse()
     openai.api_key = args.API_KEY
-    model_list = [args.m1, args.m2, args.m3]
+    model_list = [args.model_1, args.model_2, args.model_3]
 
-    prompt_dict, endpoint_dict = load_json("/src/prompt_template.json", "/src/inference_endpoint.json")
+    prompt_dict, endpoint_dict = load_json("src/prompt_template.json", "src/inference_endpoint.json")
 
     def generate_answer(model, formatted_prompt):
         API_URL = endpoint_dict[model]["API_URL"]
@@ -91,7 +96,7 @@ if __name__ == "__main__":
             "inputs": formatted_prompt,
             "parameters": {
                 "repetition_penalty": 4.0,
-                "max_length": 256
+                "max_new_tokens": 256
             }
         }
         try:
@@ -100,7 +105,7 @@ if __name__ == "__main__":
         except:
             print("retrying due to an error......")
             time.sleep(5)
-            return generate_answer(API_URL, headers, payload)
+            return generate_answer(model, formatted_prompt)
         
         return {"model": model, "content": response[0]["generated_text"]}
     
@@ -113,7 +118,7 @@ if __name__ == "__main__":
         if cot:
             instruction += "Let's think step by step."
 
-        return {"model": model, "content": prompt.format(instruction)}
+        return {"model": model, "content": prompt.format(instruction=instruction)}
 
     agents = len(model_list)
     rounds = args.round
@@ -132,14 +137,16 @@ if __name__ == "__main__":
 
         agent_contexts = generate_gsm(model_list, question)
 
-        print(f"# Question No.{idx} starts...")
+        print(f"# Question No.{idx+1} starts...")
+
+        message = []
 
         # Debate
         for debate in range(rounds+1):
             # Refer to the summarized previous response
             if debate != 0:
-                message = construct_message(agent_contexts, question, 2 * debate - 1)
-                for i in range(agent_contexts):
+                message.append(construct_message(agent_contexts, question, 2 * debate - 1))
+                for i in range(len(agent_contexts)):
                     agent_contexts[i].append(prompt_formatting(agent_contexts[i][-1]["model"], message, args.cot))
 
             for agent_context in agent_contexts:
@@ -147,15 +154,15 @@ if __name__ == "__main__":
                 completion = generate_answer(agent_context[-1]["model"], agent_context[-1]["content"])
                 agent_context.append(completion)
 
-        print(f"# Question No.{idx} debate is ended.")
+        print(f"# Question No.{idx+1} debate is ended.")
 
         models_response = {
-            f"{args.m1}": [agent_contexts[0][1]["content"], agent_contexts[0][3]["content"], agent_contexts[0][-1]["content"]],
-            f"{args.m2}": [agent_contexts[1][1]["content"], agent_contexts[1][3]["content"], agent_contexts[1][-1]["content"]],
-            f"{args.m3}": [agent_contexts[2][1]["content"], agent_contexts[2][3]["content"], agent_contexts[2][-1]["content"]]
+            f"{args.model_1}": [agent_contexts[0][1]["content"], agent_contexts[0][3]["content"], agent_contexts[0][-1]["content"]],
+            f"{args.model_2}": [agent_contexts[1][1]["content"], agent_contexts[1][3]["content"], agent_contexts[1][-1]["content"]],
+            f"{args.model_3}": [agent_contexts[2][1]["content"], agent_contexts[2][3]["content"], agent_contexts[2][-1]["content"]]
         }
         response_summarization = [
-            agent_contexts[0][2], agent_contexts[0][4]
+            message[0], message[1]
         ]
         generated_description.append({"question_id": idx, "question": question, "agent_response": models_response, "summarization": response_summarization, "answer": answer})
 

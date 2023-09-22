@@ -33,7 +33,7 @@
         "prompt_no_input": "### System:\nYou are an AI assistant that follows instruction extremely well. Help as much as you can.\n\n### User:\n{instruction}\n\n### Response:\n",
         "response_split": "### Response:"
     },
-    "wizard": {
+    "wizardlm": {
         "prompt": "A chat between a curious user and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the user's questions. USER: {instruction} ASSISTANT: ",
         "response_split": "Assistant: "
     },
