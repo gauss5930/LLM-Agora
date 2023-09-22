@@ -3,7 +3,6 @@ import openai
 import json
 import numpy as np
 import time
-from tqdm import tqdm
 import argparse
 
 def args_parse():
@@ -17,15 +16,11 @@ def args_parse():
         type=str,
         help="your OpenAI API key to use gpt-3.5-turbo"
     )
-    parser.add_argument(
-        "--auth_token",
-        type=str,
-        help="your HuggingFace API key to use Inference Endpoints"
-    )
     parser.add_argument("--round", default=2, type=int)
     parser.add_argument(
         "--cot",
-        type=bool,
+        default=False,
+        type='store_true',
         help="If this is True, you can use Chain-of-Thought during inference."
     )
     parser.add_argument(
@@ -63,7 +58,7 @@ def construct_message(agents, instruction, idx):
     ]
 
     completion = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo-16k-0613",
+        model="gpt-3.5-turbo-0613",
         messages=message,
         max_tokens=256,
         n=1
@@ -88,9 +83,15 @@ if __name__ == "__main__":
     prompt_dict, endpoint_dict = load_json("/src/prompt_template.json", "/src/inference_endpoint.json")
 
     def generate_answer(model, formatted_prompt):
-        API_URL = endpoint_dict[model]
-        headers = {"Authorization": f"Bearer {args.auth_token}"}
-        payload = {"inputs": formatted_prompt}
+        API_URL = endpoint_dict[model]["API_URL"]
+        headers = endpoint_dict[model]["headers"]
+        payload = {
+            "inputs": formatted_prompt,
+            "parameters": {
+                "repetition_penalty": 4.0,
+                "max_length": 256
+            }
+        }
         try:
             resp = requests.post(API_URL, json=payload, headers=headers)
             response = resp.json()
@@ -99,7 +100,7 @@ if __name__ == "__main__":
             time.sleep(5)
             return generate_answer(API_URL, headers, payload)
         
-        return {"model": model, "content": response[0]["generated_text"].split(prompt_dict[model]["response_split"])[-1]}
+        return {"model": model, "content": response[0]["generated_text"]}
     
     def prompt_formatting(model, instruction, cot):
         if model == "alpaca" or model == "orca":
@@ -131,7 +132,7 @@ if __name__ == "__main__":
 
         # Generate new response based on summarized response
         for agent_context in agent_contexts:
-            completion = generate_answer(agent_context[-1]["model"], agent_context[-1]["content"] if debate != 0 else prompt_formatting(agent_context[-1]["model"], agent_context[-1]["content"], args.cot)["content"])
+            completion = generate_answer(agent_context[-1]["model"], agent_context[-1]["content"])
             agent_context.append(completion)
 
     print(f"# Question debate is ended.")

@@ -32,7 +32,6 @@ class EndpointHandler:
         )
 
     def __call__(self, data: str) -> Dict[str, Any]:
-        
         prompt = data.pop("inputs", data)
         result = self.pipeline(prompt, generation_config=self.generation_config)
         return result

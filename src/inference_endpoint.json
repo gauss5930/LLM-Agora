@@ -1,29 +1,51 @@
 {
     "llama": {
-        "API_URL": ""
+        "API_URL": "https://a4f1f3224ou3zfsz.us-east-1.aws.endpoints.huggingface.cloud",
+        "headers": {
+            "Authorization": "Bearer roRQOamWcyuRkUFyRLWGKBeEXeYROElpENLBSFjDTYFQDjPdfcbuDRuTXdwFDAbKCANBgdXgTEFHtNnVCOYYwgBwMyYAECmLuMMeZAQGPLfNGPcLprKPZQReCoPshLqc",
+            "Content-Type": "application/json"
+        }
     },
-    "alpaca": {
-        "API_URL": ""
+    "llama-chat": {
+        "API_URL": "",
+        "headers": {
+            "Authorization": "Bearer roRQOamWcyuRkUFyRLWGKBeEXeYROElpENLBSFjDTYFQDjPdfcbuDRuTXdwFDAbKCANBgdXgTEFHtNnVCOYYwgBwMyYAECmLuMMeZAQGPLfNGPcLprKPZQReCoPshLqc",
+            "Content-Type": "application/json"
+        }
     },
     "vicuna": {
-        "API_URL": ""
-    },
-    "koala": {
-        "API_URL": ""
+        "API_URL": "",
+        "headers": {
+            "Authorization": "Bearer roRQOamWcyuRkUFyRLWGKBeEXeYROElpENLBSFjDTYFQDjPdfcbuDRuTXdwFDAbKCANBgdXgTEFHtNnVCOYYwgBwMyYAECmLuMMeZAQGPLfNGPcLprKPZQReCoPshLqc",
+            "Content-Type": "application/json"
+        }
     },
     "falcon": {
-        "API_URL": ""
+        "API_URL": "",
+        "headers": {
+            "Authorization": "Bearer roRQOamWcyuRkUFyRLWGKBeEXeYROElpENLBSFjDTYFQDjPdfcbuDRuTXdwFDAbKCANBgdXgTEFHtNnVCOYYwgBwMyYAECmLuMMeZAQGPLfNGPcLprKPZQReCoPshLqc",
+            "Content-Type": "application/json"
+        }
+    },
+    "falcon-instruct": {
+        "API_URL": "",
+        "headers": {
+            "Authorization": "Bearer roRQOamWcyuRkUFyRLWGKBeEXeYROElpENLBSFjDTYFQDjPdfcbuDRuTXdwFDAbKCANBgdXgTEFHtNnVCOYYwgBwMyYAECmLuMMeZAQGPLfNGPcLprKPZQReCoPshLqc",
+            "Content-Type": "application/json"
+        }
     },
     "orca": {
-        "API_URL": ""
+        "API_URL": "https://gqm6cj4t941ppx4i.us-east-1.aws.endpoints.huggingface.cloud",
+        "headers": {
+            "Authorization": "Bearer roRQOamWcyuRkUFyRLWGKBeEXeYROElpENLBSFjDTYFQDjPdfcbuDRuTXdwFDAbKCANBgdXgTEFHtNnVCOYYwgBwMyYAECmLuMMeZAQGPLfNGPcLprKPZQReCoPshLqc",
+            "Content-Type": "application/json"
+        }
     },
     "wizard": {
-        "API_URL": ""
-    },
-    "baize": {
-        "API_URL": ""
-    },
-    "phi": {
-        "API_URL": ""
+        "API_URL": "https://w5tclsm1vnqtavp2.us-east-1.aws.endpoints.huggingface.cloud",
+        "headers": {
+            "Authorization": "Bearer roRQOamWcyuRkUFyRLWGKBeEXeYROElpENLBSFjDTYFQDjPdfcbuDRuTXdwFDAbKCANBgdXgTEFHtNnVCOYYwgBwMyYAECmLuMMeZAQGPLfNGPcLprKPZQReCoPshLqc",
+            "Content-Type": "application/json"
+        }
     }
 }
