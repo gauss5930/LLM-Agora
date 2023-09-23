@@ -203,7 +203,7 @@ if __name__ == "__main__":
         response_summarization = [
             message[0], message[1]
         ]
-        generated_description.append({"question_id": round, "question": content, "agent_response": models_response, "summarization": response_summarization, "answer": answer})
+        generated_description.append({"question_id": round, "question": content, "agent_response": models_response, "summarization": response_summarization, "answer": str(answer)})
 
         try:
             text_answer = most_frequent(text_answers)
