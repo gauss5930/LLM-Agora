@@ -46,16 +46,17 @@ def construct_message(agents, instruction, idx):
         prompt = "Can you double check that your answer is correct. Please reiterate your answer, making sure to state your answer at the end of the response."
         return prompt
     
-    contexts = [agents[0][idx]['content'], agents[1][idx]['content'], agents[2][idx]['content']]
+    prefix_string = "Here are a list of opinions from different agents: "
+    
+    for agent in agents:
+        agent_response = agent[-1]["content"]
+        response = "\n\n One agent response: ```{}```".format(agent_response)
 
-    # system prompt & user prompt for gpt-3.5-turbo
-    sys_prompt = f"I want you to act as a summarizer. You can look at a question and the responses to that question and summarize the main points of them so that the meaning is not lost. Multiple responses will be given, which are responses from several different models to a single question. And you should use your excellent summarizing skills to output the best summary."
-    summarize_prompt = f"[Question]: {instruction}\n[Response 1]: {contexts[0]}\n[Response 2]: {contexts[1]}\nResponse 3: {contexts[2]}\n\nThese are response of each model to a certain question. Summarize comprehensively without compromising the meaning of each response."
+        prefix_string = prefix_string + response
 
-    message = [
-        {"role": "system", "content": sys_prompt},
-        {"role": "user", "content": summarize_prompt},
-    ]
+    prefix_string = prefix_string + "\n\n Write a summary of the different opinions from each of the individual agent."
+
+    message = [{"role": "user", "content": prefix_string}]
 
     try:
         completion = openai.ChatCompletion.create(
@@ -69,9 +70,25 @@ def construct_message(agents, instruction, idx):
         time.sleep(5)
         return construct_message(agents, instruction, idx)
 
-    prefix_string = f"This is the summarization of recent/updated opinions from other agents: {completion}"
+    prefix_string = f"Here is a summary of responses from other agents: {completion}"
     prefix_string = prefix_string + "\n\n Use this summarization carefully as additional advice, can you provide an updated answer? Make sure to state your answer at the end of the response." + instruction
     return prefix_string
+
+def summarize_message(agent_contexts):
+    prefix_string = "Here are a list of opinions from different agents: "
+
+    for agent in agent_contexts:
+        agent_response = agent[-1]["content"]
+        response = "\n\n One agent response: ```{}```".format(agent_response)
+
+        prefix_string = prefix_string + response
+
+    prefix_string = prefix_string + "\n\n Write a summary of the different opinions from each of the individual agent."
+    agent_context = [{"role": "user", "content": prefix_string}]
+    completion = construct_message(agent_context)
+    content = completion["choices"][0]["message"]["content"]
+
+    return content
 
 def generate_question(agents, question):
     agent_contexts = [[{"model": agent, "content": question}] for agent in agents]
@@ -133,7 +150,7 @@ if __name__ == "__main__":
     for debate in range(rounds+1):
         # Refer to the summarized previous response
         if debate != 0:
-            message.append(construct_message(agent_contexts, content, 2 * debate - 1))
+            message.append(summarize_message(agent_contexts, content, 2 * debate - 1))
             for i in range(len(agent_contexts)):
                 agent_contexts[i].append(prompt_formatting(agent_contexts[i][-1]["model"], message, args.cot))
 
