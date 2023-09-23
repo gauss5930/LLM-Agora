@@ -43,13 +43,9 @@ def load_json(prompt_path, endpoint_path):
     return prompt_dict, endpoint_dict
 
 def construct_message(agent_context, instruction, idx):
-    if len(agents) == 0:
-        prompt = "Can you double check that your answer is correct. Please reiterate your answer, making sure to state your answer at the end of the response."
-        return prompt
-    
     prefix_string = "Here are a list of opinions from different agents: "
 
-    prefix_string = prefix_string + agent_context["content"] + "\n\n Write a summary of the different opinions from each of the individual agent."
+    prefix_string = prefix_string + agent_context + "\n\n Write a summary of the different opinions from each of the individual agent."
 
     message = [{"role": "user", "content": prefix_string}]
 
@@ -63,7 +59,7 @@ def construct_message(agent_context, instruction, idx):
     except:
         print("retrying ChatGPT due to an error......")
         time.sleep(5)
-        return construct_message(agents, instruction, idx)
+        return construct_message(agent_context, instruction, idx)
 
     prefix_string = f"Here is a summary of responses from other agents: {completion}"
     prefix_string = prefix_string + "\n\n Use this summarization carefully as additional advice, can you provide an updated answer? Make sure to state your answer at the end of the response." + instruction
