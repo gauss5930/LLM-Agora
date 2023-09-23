@@ -43,20 +43,14 @@ def load_json(prompt_path, endpoint_path):
 
     return prompt_dict, endpoint_dict
 
-def construct_message(agents, instruction, idx):
+def construct_message(agent_context, instruction, idx):
     if len(agents) == 0:
         prompt = "Can you double check that your answer is correct. Please reiterate your answer, making sure to state your answer at the end of the response."
         return prompt
     
     prefix_string = "Here are a list of opinions from different agents: "
-    
-    for agent in agents:
-        agent_response = agent[-1]["content"]
-        response = "\n\n One agent response: ```{}```".format(agent_response)
 
-        prefix_string = prefix_string + response
-
-    prefix_string = prefix_string + "\n\n Write a summary of the different opinions from each of the individual agent."
+    prefix_string = prefix_string + agent_context["content"] + "\n\n Write a summary of the different opinions from each of the individual agent."
 
     message = [{"role": "user", "content": prefix_string}]
 
@@ -76,7 +70,7 @@ def construct_message(agents, instruction, idx):
     prefix_string = prefix_string + "\n\n Use this summarization carefully as additional advice, can you provide an updated answer? Make sure to state your answer at the end of the response." + instruction
     return prefix_string
 
-def summarize_message(agent_contexts):
+def summarize_message(agent_contexts, instruction, idx):
     prefix_string = "Here are a list of opinions from different agents: "
 
     for agent in agent_contexts:
@@ -86,11 +80,9 @@ def summarize_message(agent_contexts):
         prefix_string = prefix_string + response
 
     prefix_string = prefix_string + "\n\n Write a summary of the different opinions from each of the individual agent."
-    agent_context = [{"role": "user", "content": prefix_string}]
-    completion = construct_message(agent_context)
-    content = completion["choices"][0]["message"]["content"]
+    completion = construct_message(prefix_string, instruction, idx)
 
-    return content
+    return completion
 
 def parse_question_answer(df):
     question = f"Can you answer the following question as accurately as possible? {df['question']}: A) {df['A']}, B) {df['B']}, C) {df['C']}, D) {df['D']} Explain your answer, putting the answer in the form (X) at the end of your response."
