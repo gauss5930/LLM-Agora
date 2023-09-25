@@ -106,7 +106,7 @@ if __name__ == "__main__":
             }
         }
         try:
-            resp = requests.post(model, formatted_prompt)
+            resp = requests.post(API_URL, json=payload, headers=headers)
             response = resp.json()
         except:
             print("retrying due to an error......")
