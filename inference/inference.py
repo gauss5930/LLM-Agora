@@ -98,7 +98,6 @@ if __name__ == "__main__":
         payload = {
             "inputs": formatted_prompt,
             "parameters": {
-                "repetition_penalty": 4.0,
                 "max_new_tokens": 256
             }
         }
