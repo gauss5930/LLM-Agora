@@ -120,7 +120,7 @@ if __name__ == "__main__":
         responses = [response_dict[idx]["agent_response"][model][-1] for model in model_list]
         gt = response_dict[idx]["answer"]
 
-        accurate = compute_accuracy(gt, response)
+        accurate = compute_accuracy(gt, responses)
 
         if accurate is not None:
             accuracies.append(float(accurate))
