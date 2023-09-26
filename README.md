@@ -1,22 +1,17 @@
-# LLM-Agora
-LLM Agora, debating between open-source LLMs to refine the answers
+<p align="center"><img src="/assets/LLM-Agora.jpg"></p>
+
+# LLM Agora
+LLM Agora, the place to debate between open-source LLMs and revise their responses!
 
 The **LLM Agora** 🗣️🏦 aims to improve the quality of open-source LMs' responses through debate & revision introduced in [Improving Factuality and Reasoning in Language Models through Multiagent Debate](https://arxiv.org/abs/2305.14325).
+Thank you to the authors of this paper for suggesting a great idea!
 
 Do you know that? 🤔 **LLMs can also improve their responses by debating with other LLMs**! 😮 We applied this concept to several open-source LMs to verify that the open-source model, not the proprietary one, can sufficiently improve the response through discussion. 🤗
-For more details, please refer to the [GitHub Repository](https://github.com/gauss5930/LLM-Agora).
+For this, we have developed **LLM Agora**!
+You can try the LLM Agora and check the example responses in [LLM Agora Spaces](https://huggingface.co/spaces/Cartinoe5930/LLMAgora)!
 
-You can use LLM Agora with your own questions if the response of open-source LM is not satisfactory and you want to improve the quality!
-The Math, GSM8K, and MMLU Tabs show the results of the experiment(Llama2, WizardLM2, Orca2), and for inference, please use the 'Inference' tab.
+We tried to follow the overall framework of [llm_multiagent_debate](https://github.com/composable-models/llm_multiagent_debate), and we added additional things such as CoT.
 
-Here's how to use LLM Agora!
-
-1. Choose just 3 models! Neither more nor less!
-2. Check the CoT box if you want to utilize the Chain-of-Thought while inferencing.
-3. Please fill in your OpenAI API KEY, it will be used to use ChatGPT to summarize the responses.
-4. Type your question to Question box and click the 'Submit' button! If you do so, LLM Agora will show you improved answers! 🤗
-
-For more information, please check '※ Specific information about LLM Agora' at the bottom of the page.
 
 ## Inference
 
