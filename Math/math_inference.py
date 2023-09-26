@@ -92,28 +92,6 @@ def generate_math(agents):
 
     return agent_contexts, content, question_prompt, answer
 
-def parse_answer(sentence):
-    parts = sentence.split(" ")
-
-    for part in parts[::-1]:
-        try:
-            answer = float(part)
-            return answer
-        except:
-            continue
-
-def most_frequent(List):
-    counter = 0
-    num = List[0]
-
-    for i in List:
-        current_frequency = List.count(i)
-        if current_frequency > counter:
-            counter = current_frequency
-            num = i
-
-    return num
-
 if __name__ == "__main__":
     args = args_parse()
     openai.api_key = args.API_KEY
@@ -182,18 +160,6 @@ if __name__ == "__main__":
 
         print(f"# Question No.{round+1} debate is ended.")
 
-        text_answers = []
-
-        for agent in agent_contexts:
-            text_answer = string = agent[-1]["content"]
-            text_answer = text_answer.replace(",", ".")
-            text_answer = parse_answer(text_answer)
-
-            if not text_answer:
-                continue
-
-            text_answers.append(text_answer)
-
         models_response = {
             f"{args.model_1}": [agent_contexts[0][1]["content"], agent_contexts[0][3]["content"], agent_contexts[0][-1]["content"]],
             f"{args.model_2}": [agent_contexts[1][1]["content"], agent_contexts[1][3]["content"], agent_contexts[1][-1]["content"]],
@@ -204,18 +170,6 @@ if __name__ == "__main__":
         ]
         generated_description.append({"question_id": round, "question": content, "agent_response": models_response, "summarization": response_summarization, "answer": str(answer)})
 
-        try:
-            text_answer = most_frequent(text_answers)
-            if text_answer == answer:
-                scores.append(1)
-            else:
-                scores.append(0)
-        except:
-            continue
-
-    performance = {"performance": np.mean(scores)}
-    print(f"The performance of {args.model_1} & {args.model_2} & {args.model_3}: ", performance["performance"])
-
     if args.cot:
         file_name = "_cot.json"
     else:
@@ -224,9 +178,5 @@ if __name__ == "__main__":
     print(f"The result file 'math_result{file_name}' is saving...")
     with open(args.output_dir + f"/math_result{file_name}", "x") as f:
         json.dump(generated_description, f, indent=4)
-
-    print(f"The performance file 'math_performance{file_name}' is saving...")
-    with open(args.output_dir + f"/math_performance{file_name}", "x") as f:
-        json.dump(performance, f, indent=4)
 
     print("All done!!")
