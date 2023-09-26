@@ -39,12 +39,12 @@ def solve_math_problems(input_str):
 
     matches = re.findall(pattern, input_str)
     if matches:
-        return matches[-1]
+        return float(matches[-1])
     
     return None
 
 def parse_answer(input_str):
-    pattern = r"\{([0-9.,$]*)\}"
+    pattern = r"([0-9]*)"
     matches = re.findall(pattern, input_str)
 
     solution = None
@@ -54,7 +54,16 @@ def parse_answer(input_str):
         if solution:
             break
 
-    return solution
+    if solution:
+        return float(solution)
+    else:
+        return solution
+
+def answer_check(List, answer):
+    if answer in List: 
+        return 1.0
+    else:
+        return 0.0
 
 def compute_accuracy(gt, pred_solutions):
     answers = solve_math_problems(gt)
@@ -73,35 +82,11 @@ def compute_accuracy(gt, pred_solutions):
 
             pred_answers.append(pred_answer)
 
-        pred_answer = most_frequent(pred_answers)
-    else:
-        pred_answer = parse_answer(pred_solution)
-        if not pred_answer:
-            pred_answer = solve_math_problems(pred_solution)
+        return answer_check(pred_answers, answers)
 
-    if not pred_answer:
-        return 1
-    
-    if float(answers) == float(pred_answer):
-        return 1
-    else:
-        return 0
-    
-def most_frequent(List):
-    counter = 0
-    num = List[0]
-
-    for i in List:
-        current_frequency = List.count(i)
-        if current_frequency > counter:
-            counter = current_frequency
-            num = i
-
-    return num
 
 if __name__ == "__main__":
     args = args_parse()
-
     model_list = [args.model_1, args.model_2, args.model_3]
 
     if args.cot:
@@ -114,22 +99,23 @@ if __name__ == "__main__":
 
     questions = [response_dict[i]["question"] for i in range(len(response_dict))]
 
-    accuracies = []
+    performance = []
 
-    for idx in range(len(questions)):
-        responses = [response_dict[idx]["agent_response"][model][-1] for model in model_list]
-        gt = response_dict[idx]["answer"]
+    for turn in range(3):
+        accuracies = []
+        for idx in range(len(questions)):
+            responses = [response_dict[idx]["agent_response"][model][turn] for model in model_list]
+            gt = response_dict[idx]["answer"]
 
-        accurate = compute_accuracy(gt, responses)
+            accurate = compute_accuracy(gt, responses)
 
-        if accurate is not None:
-            accuracies.append(float(accurate))
-        else:
-            import pdb
-            pdb.set_trace()
-            print(gt)
+            if accurate is not None:
+                accuracies.append(float(accurate))
+            else:
+                accuracies.append(0.0)
 
-    performance = {"performance": np.mean(accuracies)}
+        performance.append({f"{turn}_performance": np.mean(accuracies)})
+        print(performance)
 
     print(f"The performance file 'gsm_performance{file_name}' is saving...")
     with open(args.output_dir + f"/gsm_performance{file_name}", "x") as f:
