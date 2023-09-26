@@ -71,12 +71,12 @@ def compute_accuracy(gt, pred_solutions):
 
         if pred_answer is None:
             return 0
-        pred_answer = answer_check(pred_answers)
+        pred_answer = answer_check(pred_answers, gt)
     else:
         pred_answer = parse_answer(pred_solutions)
         if pred_answer is None:
             pred_answer = solve_math_problems(pred_solutions)
-            pred_answer = answer_check(pred_answer)
+            pred_answer = answer_check(pred_answer, gt)
 
     return pred_answer
 
