@@ -1,4 +1,4 @@
-<p align="center"><img src="/assets/LLM-Agora.jpg"></p>
+<p align="center"><img src="/assets/LLM-Agora.png"></p>
 
 # LLM Agora
 LLM Agora, the place to debate between open-source LLMs and revise their responses!
