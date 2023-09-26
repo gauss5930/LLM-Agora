@@ -114,8 +114,8 @@ if __name__ == "__main__":
             else:
                 accuracies.append(0.0)
 
-        performance.append({f"{turn}_performance": np.mean(accuracies)})
-        print(performance)
+        performance.append({f"{turn+1}_performance": np.mean(accuracies)})
+        print({f"{turn+1}_performance": np.mean(accuracies)})
 
     print(f"The performance file 'gsm_performance{file_name}' is saving...")
     with open(args.output_dir + f"/gsm_performance{file_name}", "x") as f:
