@@ -44,7 +44,7 @@ def solve_math_problems(input_str):
     return None
 
 def parse_answer(input_str):
-    pattern = r'(\w)\)'
+    pattern = r'([A-Za-z])\)'
     matches = re.findall(pattern, input_str)
 
     solution = None
