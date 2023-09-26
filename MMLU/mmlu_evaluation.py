@@ -44,7 +44,7 @@ def solve_math_problems(input_str):
     return None
 
 def parse_answer(input_str):
-    pattern = r'\((\w)\)'
+    pattern = r'(\w)\)'
     matches = re.findall(pattern, input_str)
 
     solution = None
@@ -71,30 +71,20 @@ def compute_accuracy(gt, pred_solutions):
 
         if pred_answer is None:
             return 0
-        pred_answer = most_frequent(pred_answers)
-        # pred_answer = pred_answers[0]
+        pred_answer = answer_check(pred_answers)
     else:
         pred_answer = parse_answer(pred_solutions)
         if pred_answer is None:
             pred_answer = solve_math_problems(pred_solutions)
+            pred_answer = answer_check(pred_answer)
 
-    if gt == pred_answer:
-        return 1
+    return pred_answer
+
+def answer_check(List, answer):
+    if answer in List: 
+        return 1.0
     else:
-        return 0
-
-
-def most_frequent(List):
-    counter = 0
-    num = List[0]
-
-    for i in List:
-        current_frequency = List.count(i)
-        if current_frequency > counter:
-            counter = current_frequency
-            num = i
-
-    return num
+        return 0.0
 
 if __name__ == "__main__":
     args = args_parse()
@@ -111,22 +101,23 @@ if __name__ == "__main__":
 
     questions = [response_dict[i]["question"] for i in range(len(response_dict))]
 
-    accuracies = []
+    performance = []
 
-    for idx in range(len(questions)):
-        responses = [response_dict[idx]["agent_response"][model][-1] for model in model_list]
-        gt = response_dict[idx]["answer"]
-
-        accurate = compute_accuracy(gt, responses)
-
-        if accurate is not None:
-            accuracies.append(float(accurate))
-        else:
-            import pdb
-            pdb.set_trace()
-            print(gt)
-
-    performance = {"performance": np.mean(accuracies)}
+    for turn in range(3):
+        accuracies = []
+        for idx in range(len(questions)):
+            responses = [response_dict[idx]["agent_response"][model][turn] for model in model_list]
+            gt = response_dict[idx]["answer"]
+    
+            accurate = compute_accuracy(gt, responses)
+    
+            if accurate is not None:
+                accuracies.append(float(accurate))
+            else:
+                accuracies.append(0.0)
+    
+        performance.append({f"{turn+1}_performance": np.mean(accuracies)})
+        print(performance[-1])
 
     print(f"The performance file 'mmlu_performance{file_name}' is saving...")
     with open(args.output_dir + f"/mmlu_performance{file_name}", "x") as f:
