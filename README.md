@@ -1,7 +1,7 @@
 <p align="center"><img src="/assets/LLM-Agora.png", width='250', height='250'></p>
 
 # LLM Agora
-LLM Agora, is the place to debate between open-source LLMs and revise their responses!
+LLM Agora is the place to debate between open-source LLMs and revise their responses!
 
 The **LLM Agora** 🗣️🏦 aims to improve the quality of open-source LMs' responses through debate & revision introduced in [Improving Factuality and Reasoning in Language Models through Multiagent Debate](https://arxiv.org/abs/2305.14325).
 We would like to thank the authors of the paper for their brilliant ideas that allowed me to pursue this project.
@@ -32,7 +32,7 @@ For example, GPT-4 is enough to pass even difficult exams.
 Despite the brilliant performance of proprietary LLMs, their first responses have some errors or mistakes. 
 Then, how can correct and revise the responses? 
 In the paper, they suggested that debate between several agents can revise the responses and improve the performance!
-Through several experiments, the fact that this method can really correct the errors in responses and revise the quality of responses was proved. (If you want to know more, please check the official [GitHub Page of paper](https://composable-models.github.io/llm_debate/)!)
+Through several experiments, the fact that this method can correct the errors in responses and revise the quality of responses was proved. (If you want to know more, please check the official [GitHub Page of paper](https://composable-models.github.io/llm_debate/)!)
 
 In the paper, the overall experiment is conducted using only one model, but in the Analysis part, it is said that a synergy effect that shows further improved performance can be seen when different types of LLM are used.
 The LLM Agora is exactly inspired from this point! 
@@ -67,29 +67,29 @@ The goal of experiments is as follows:
 
 ### Experimental setup
 
-**Tasks**
+#### Tasks
 
-We conducted an experiment using the same task in the paper.
+We experimented using the same task in the paper.
 The tasks on which the experiment was performed are as follows: 
 
 - **Math**: The problem of arithmetic operations on six randomly selected numbers. The format is `{}+{}*{}+{}-{}*{}=?`
-- **GSM8K**: GSM8K is a dataset of high-quality linguistically diverse grade school math word problems.
+- **GSM8K**: GSM8K is a dataset consisting of high-quality linguistically diverse grade school math word problems.
 - **MMLU**: MMLU is a benchmark covering 57 subjects across STEM, the humanities, the social sciences, and more.
 
 For all tasks, only 100 questions were sampled and used in the experiment.
 
-**The number of agents & rounds**
+#### The number of agents & rounds
 
 The multi-agent debate has some special parameters such as the number of **agents** and **rounds**.
 Each means **the number of used models for debate** and **the number of will be conducted debate rounds**.
 The number of agents and rounds were set to **3** and **2**, respectively, due to the resource issue.
 
-**Baselines & Summarizer model**
+#### Baselines & Summarizer model
 
 The models were deployed with [HuggingFace Inference Endpoints](https://huggingface.co/inference-endpoints), but for some reason, models based on LLaMA1 cannot be deployed with Inference Endpoints, so models based on LLaMA2 were mainly used.
 In addition, GPTQ models were used to reduce the model size for deployment as an Inference Endpoint.
 Thank you to [TheBloke](https://huggingface.co/TheBloke) for uploading the GPTQ model.
-The models in **bold** are the baseline models used in LLM Agora experiment.
+The models in **bold** are the baseline models used in the LLM Agora experiment.
 
 - **Llama2-13B**: https://huggingface.co/TheBloke/Carl-Llama-2-13B-GPTQ
 - Llama2-13B-Chat: https://huggingface.co/TheBloke/Llama-2-13B-chat-GPTQ
@@ -101,7 +101,7 @@ The models in **bold** are the baseline models used in LLM Agora experiment.
 
 We also used ChatGPT(gpt-3.5-turbo) as a summarizer model that summarizes the models' responses.
 
-**Prompt Format**
+#### Prompt Format
 
 Please check the `src/prompt_template.json`!
 
@@ -126,7 +126,7 @@ The result of the Math task is as follows:
 
 ### Results: GSM8K
 
-GSM8K is the high-quality linguistically diverse grade school math word problems.
+GSM8K is the high-quality linguistically diverse grade school math word problem.
 The result of GSM8K showed that, unlike the result of other tasks, the models did not gain much benefit from debate and CoT.
 There was no change in performance despite the debate when CoT was not used, and performance got worse as the debate progressed when CoT was used.
 You can check the responses to GSM8K of each model in [LLM Agora Space](https://huggingface.co/spaces/Cartinoe5930/LLMAgora) or `GSM8K/gsm_result.json` and `GSM8K/gsm_result_cot.json`.
@@ -161,21 +161,21 @@ The result of MMLU is as follows:
 
 ## Analysis
 
-The experiments of LLM Agora is performed on Math, GSM8K, and MMLU.
-The results showed that although open-source LLMs have some shortcomings to perform the multi-agent debate method, it is also effective in open-source LLMs too. 
+The experiments of LLM Agora are performed on Math, GSM8K, and MMLU.
+The results showed that although open-source LLMs have some shortcomings in performing the multi-agent debate method, it is also effective in open-source LLMs. 
 In addition, we were able to confirm that performance improved even when CoT was used.
-However, the improvement in performance was not significant, and in the case of GSM8K, it was not affected by debate & CoT.
+However, the performance improvement was not significant, and in the case of GSM8K, it was not affected by debate & CoT.
 
 In addition, the quality of the responses to each task of the models was not good.
-Since the quality of the responses is not good, it seems that the multi-agent debate had a negative effect on the quality of the responses.
+Since the quality of the responses is not good, it seems that the multi-agent debate hurt the quality of the responses.
 The analysis of the experiment results is summarized as follows:
 
 - Open-source LLMs can benefit from multi-agent debate and CoT when models output proper quality responses.
-- We did not investigate the synergy effect that occurs when using various models in the experiment. However judging from the results of deteriorating performance through debate, it may be possible to demonstrate a good synergy effect if the models' responses are high-quality, but if this is not the case, In fact, it was confirmed that it could worsen performance.
+- We did not investigate the synergy effect that occurs when using various models in the experiment. However judging from the results of deteriorating performance through debate, it may be possible to demonstrate a good synergy effect if the models' responses are high-quality, but if this is not the case it was confirmed that it could worsen performance.
 
 Although the LLM Agora that utilized open-source LLMs has some shortcomings, we confirmed that multi-agent debate can improve the performance of models.
 Therefore, multi-agent debate could become an effective method to improve the quality of models' responses if additional improvements are made to the open-source models and multi-agent debate.
-We hope that LLM Agora will be helpful in researching methods to improve the performance of open-source models, and really appreciate the authors of '[Improving Factuality and Reasoning in Language Models through Multiagent Debate](https://arxiv.org/abs/2305.14325)' for suggesting multi-agent debate, which is the motivation of LLM Agora.
+We hope that LLM Agora will help research methods to improve the performance of open-source models, and appreciate the authors of '[Improving Factuality and Reasoning in Language Models through Multiagent Debate](https://arxiv.org/abs/2305.14325)' for suggesting multi-agent debate, which is the motivation of LLM Agora.
 
 ## Future work
 
@@ -187,7 +187,7 @@ In addition, since the resource issue, LLM Agora supports just 7 models, however
 
 The following description is the process of our experiment. Please follow the process of our experiment, if you want to conduct them!
 We would like to note that we don't provide the inference endpoint APIs. 
-Therefore, we recommend creating your own inference endpoint API if you want to conduct the experiments.
+Therefore, we recommend creating your inference endpoint API if you want to conduct the experiments.
 
 0. [**Setup inference endpoint**](#setup-inference-endpoint)
 1. [**Requirements**](#requirements)
@@ -197,10 +197,10 @@ Therefore, we recommend creating your own inference endpoint API if you want to 
 ### Setup inference endpoint
 
 As we mentioned above, we don't provide any inference endpoint API.
-Therefore, you should create your own inference endpoint API if you want to conduct the experiments.
+Therefore, you should create your inference endpoint API if you want to conduct the experiments.
 The process of setup inference endpoint is as follows:
 
-1. Create your own inference endpoint API using [HuggingFace Inference Endpoints](https://huggingface.co/inference-endpoints) for the models mentioned in the **Experimental setup**.
+1. Create your inference endpoint API using [HuggingFace Inference Endpoints](https://huggingface.co/inference-endpoints) for the models mentioned in the **Experimental setup**.
 2. Fill in the blanks of `src/inference_endpoint.json` with your inference endpoint API. `src/inference_endpoint.json` will be used when performing inference. 
 
 ### Requirements
